@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Корзина Покупок</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .back-btn {
+      padding: 10px 20px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+
+    h1 {
+      color: #333;
+      font-size: 2.5em;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      margin: 0;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 600px;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .cart-section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 25px;
+    }
+
+    .map-section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 25px;
+    }
+
+    .section-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #667eea;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.2em;
+      color: #666;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 50px;
+      color: #666;
+    }
+
+    .empty-cart h3 {
+      font-size: 1.5em;
+      margin-bottom: 15px;
+    }
+
+    .restaurant-group {
+      background: white;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .restaurant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .restaurant-name {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .restaurant-address {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .restaurant-subtotal {
+      font-weight: bold;
+      color: #667eea;
+      font-size: 1.1em;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .item-description {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .item-quantity {
+      margin: 0 20px;
+      font-weight: bold;
+    }
+
+    .item-price {
+      font-weight: bold;
+      color: #667eea;
+      margin-right: 10px;
+    }
+
+    .remove-btn {
+      padding: 5px 10px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8em;
+    }
+
+    .remove-btn:hover {
+      background: #c0392b;
+    }
+
+    .cart-summary {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      border: 2px solid #667eea;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .order-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(45deg, #28a745, #20c997);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .order-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    }
+
+    .order-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    #map {
+      width: 100%;
+      height: 400px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .route-info {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .route-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .route-item:last-child {
+      border-bottom: none;
+    }
+
+    .route-name {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .route-details {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .total-route-info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .total-distance {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #1976d2;
+      margin-bottom: 5px;
+    }
+
+    .total-time {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #d32f2f;
+    }
+
+    .error-message {
+      text-align: center;
+      color: #e74c3c;
+      padding: 20px;
+      background: #ffeaa7;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 1200px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .map-section {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+        margin: 10px;
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .item-quantity, .item-price {
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <a href="index.html" class="back-btn">← Назад к Ресторанам</a>
+      <h1>🛒 Корзина Покупок</h1>
+      <div></div> <!-- Spacer for flex layout -->
+    </div>
+
+    <div id="loading" class="loading">Загрузка вашей корзины...</div>
+    
+    <div id="mainContent" class="main-content" style="display: none;">
+      <div class="cart-section">
+        <div class="section-title">Ваш Заказ</div>
+        <div id="cartItems"></div>
+        <div id="cartSummary" class="cart-summary" style="display: none;">
+          <div class="total-row">
+            <span>Общая Сумма:</span>
+            <span id="totalAmount">₽0</span>
+          </div>
+          <button class="order-btn" id="orderBtn" onclick="placeOrder()">Оформить Заказ</button>
+        </div>
+      </div>
+
+      <div class="map-section">
+        <div class="section-title">Маршрут Доставки</div>
+        <div id="map"></div>
+        <div id="routeInfo" class="route-info" style="display: none;">
+          <div id="routeList"></div>
+          <div id="totalRouteInfo" class="total-route-info">
+            <div class="total-distance" id="totalDistance">Общее расстояние: 0 км</div>
+            <div class="total-time" id="totalTime">Ориентировочное время: 0 мин</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="emptyCart" class="empty-cart" style="display: none;">
+      <h3>Ваша корзина пуста</h3>
+      <p>Добавьте вкусные блюда из наших ресторанов!</p>
+      <br>
+      <a href="index.html" class="back-btn">Посмотреть Рестораны</a>
+    </div>
+
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
+  </div>
+
+  <!-- Yandex Maps API -->
+  <script src="https://api-maps.yandex.ru/2.1/?lang=en_US&apikey=c045d2a8-bc9f-46c5-95ab-d41879ea8136" type="text/javascript"></script>
+  
+  <script>
+    // Dynamic API base URL - works on both localhost and network
+    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+      ? 'http://localhost:5000' 
+      : `http://${window.location.hostname}:5000`;
+    
+    let cartData = null;
+    let map = null;
+    let userLocation = { lat: 59.9311, lon: 30.3609 }; // Default Saint Petersburg center
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get user's location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            userLocation = {
+              lat: position.coords.latitude,
+              lon: position.coords.longitude
+            };
+            loadCart();
+          },
+          (error) => {
+            console.log('Доступ к геолокации запрещён, используем локацию по умолчанию');
+            loadCart();
+          }
+        );
+      } else {
+        loadCart();
+      }
+    });
+
+    async function loadCart() {
+      try {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('emptyCart').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'none';
+
+        const response = await fetch(`${API_BASE}/cart/1`);
+        if (!response.ok) throw new Error('Failed to fetch cart');
+        
+        cartData = await response.json();
+        
+        if (cartData.total_items === 0) {
+          showEmptyCart();
+        } else {
+          displayCart(cartData);
+          loadMap();
+        }
+        
+      } catch (error) {
+        console.error('Error loading cart:', error);
+        showError('Не удалось загрузить корзину. Пожалуйста, убедитесь, что сервер запущен.');
+      }
+    }
+
+    function displayCart(data) {
+      document.getElementById('loading').style.display = 'none';
+      
+      let cartHTML = '';
+      
+      Object.keys(data.restaurants).forEach(restaurantId => {
+        const restaurant = data.restaurants[restaurantId];
+        cartHTML += `
+          <div class="restaurant-group">
+            <div class="restaurant-header">
+              <div>
+                <div class="restaurant-name">${restaurant.restaurant_name}</div>
+                <div class="restaurant-address">📍 ${restaurant.restaurant_address}</div>
+              </div>
+              <div class="restaurant-subtotal">₽${restaurant.subtotal}</div>
+            </div>
+            <div class="cart-items">
+              ${restaurant.items.map(item => `
+                <div class="cart-item">
+                  <div class="item-info">
+                    <div class="item-name">${item.item_name}</div>
+                    <div class="item-description">${item.description}</div>
+                  </div>
+                  <div class="item-quantity">×${item.quantity}</div>
+                  <div class="item-price">₽${item.price * item.quantity}</div>
+                  <button class="remove-btn" onclick="removeItem(${item.item_id})">Удалить</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('cartItems').innerHTML = cartHTML;
+      document.getElementById('totalAmount').textContent = `₽${data.total_amount}`;
+      document.getElementById('cartSummary').style.display = 'block';
+      document.getElementById('mainContent').style.display = 'grid';
+    }
+
+    function showEmptyCart() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('emptyCart').style.display = 'block';
+    }
+
+    function showError(message) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('errorMessage').style.display = 'block';
+      document.getElementById('errorMessage').textContent = message;
+    }
+
+    function loadMap() {
+      if (typeof ymaps === 'undefined') {
+        document.getElementById('map').innerHTML = '<div style="text-align: center; padding: 50px; color: #666;">Картографический сервис недоступен</div>';
+        return;
+      }
+
+      ymaps.ready(initMap);
+    }
+
+    function initMap() {
+      map = new ymaps.Map("map", {
+        center: [userLocation.lat, userLocation.lon],
+        zoom: 12,
+        controls: ['zoomControl', 'fullscreenControl']
+      });
+
+      // Add user location marker
+      const userPlacemark = new ymaps.Placemark([userLocation.lat, userLocation.lon], {
+        balloonContent: "Ваше Местоположение",
+        iconContent: "Вы"
+      }, {
+        preset: 'islands#redStretchyIcon'
+      });
+      map.geoObjects.add(userPlacemark);
+
+      // Add restaurant markers and calculate route
+      const restaurants = [];
+      Object.keys(cartData.restaurants).forEach(restaurantId => {
+        const restaurant = cartData.restaurants[restaurantId];
+        restaurants.push({
+          name: restaurant.restaurant_name,
+          lat: restaurant.lat,
+          lon: restaurant.lon
+        });
+
+        // Add restaurant marker
+        const restaurantPlacemark = new ymaps.Placemark([restaurant.lat, restaurant.lon], {
+          balloonContent: restaurant.restaurant_name,
+          iconContent: restaurant.restaurant_name.substring(0, 3)
+        }, {
+          preset: 'islands#blueStretchyIcon'
+        });
+        map.geoObjects.add(restaurantPlacemark);
+      });
+
+      // Calculate and display route
+      calculateRoute(restaurants);
+    }
+
+    async function calculateRoute(restaurants) {
+      try {
+        const response = await fetch(`${API_BASE}/route`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_lat: userLocation.lat,
+            user_lon: userLocation.lon,
+            restaurants: restaurants
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to calculate route');
+        
+        const routeData = await response.json();
+        displayRouteInfo(routeData);
+        
+      } catch (error) {
+        console.error('Error calculating route:', error);
+        document.getElementById('routeInfo').innerHTML = '<div class="error-message">Не удалось рассчитать маршрут</div>';
+      }
+    }
+
+    function displayRouteInfo(routeData) {
+      let routeHTML = '';
+      
+      routeData.route.forEach((stop, index) => {
+        routeHTML += `
+          <div class="route-item">
+            <div>
+              <div class="route-name">${index + 1}. ${stop.restaurant_name}</div>
+              <div class="route-details">Расстояние: ${stop.distance_km} км • Время: ${stop.delivery_time_minutes} мин</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('routeList').innerHTML = routeHTML;
+      document.getElementById('totalDistance').textContent = `Общее расстояние: ${routeData.total_distance_km} км`;
+      document.getElementById('totalTime').textContent = `Ориентировочное время: ${routeData.total_delivery_time_minutes} мин`;
+      document.getElementById('routeInfo').style.display = 'block';
+    }
+
+    async function removeItem(itemId) {
+      try {
+        const response = await fetch(`${API_BASE}/cart/item/${itemId}?user_id=1`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) throw new Error('Failed to remove item');
+        
+        // Reload cart
+        loadCart();
+        
+      } catch (error) {
+        console.error('Error removing item:', error);
+        alert('Не удалось удалить товар из корзины');
+      }
+    }
+
+    async function placeOrder() {
+      try {
+        const orderBtn = document.getElementById('orderBtn');
+        orderBtn.disabled = true;
+        orderBtn.textContent = 'Оформляем заказ...';
+
+        // Clear cart after successful order
+        const response = await fetch(`${API_BASE}/cart/clear`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user_id: 1 })
+        });
+
+        if (!response.ok) throw new Error('Failed to place order');
+        
+        alert('Заказ успешно оформлен! Ваша еда скоро будет доставлена.');
+        window.location.href = 'index.html';
+        
+      } catch (error) {
+        console.error('Error placing order:', error);
+        alert('Не удалось оформить заказ. Попробуйте ещё раз.');
+        
+        const orderBtn = document.getElementById('orderBtn');
+        orderBtn.disabled = false;
+        orderBtn.textContent = 'Оформить Заказ';
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Карта</title>
+  <style>
+    #map { width: 100%; height: 500px; }
+  </style>
+</head>
+<body>
+
+  <h1>Карта ресторанов</h1>
+  <div id="map"></div>
+
+  <!-- Подключение API Яндекс Карт с токеном -->
+  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=c045d2a8-bc9f-46c5-95ab-d41879ea8136" type="text/javascript"></script>
+  <script>
+    ymaps.ready(init);
+
+    function init() {
+      const map = new ymaps.Map("map", {
+        center: [55.7558, 37.6176], // Москва
+        zoom: 12
+      });
+
+      // Добавляем метки для ресторанов
+      const restaurant1Coords = [55.7558, 37.6176]; // Пример координат
+      const restaurant2Coords = [55.759, 37.625]; // Пример координат
+
+      const restaurant1 = new ymaps.Placemark(restaurant1Coords, { balloonContent: "Ресторан 1" });
+      const restaurant2 = new ymaps.Placemark(restaurant2Coords, { balloonContent: "Ресторан 2" });
+
+      map.geoObjects.add(restaurant1);
+      map.geoObjects.add(restaurant2);
+    }
+  </script>
+
+</body>
+</html>

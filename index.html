@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Доставка Еды - Рестораны</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .filters {
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .filter-btn {
+      padding: 10px 20px;
+      border: 2px solid #667eea;
+      background: white;
+      color: #667eea;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.2em;
+      color: #666;
+    }
+
+    .restaurants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .restaurant-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      border: 1px solid #eee;
+    }
+
+    .restaurant-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .restaurant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .restaurant-name {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #333;
+      margin: 0;
+    }
+
+    .restaurant-rating {
+      background: #ffd700;
+      color: #333;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 0.9em;
+      font-weight: bold;
+    }
+
+    .restaurant-info {
+      margin-bottom: 15px;
+    }
+
+    .cuisine-type {
+      display: inline-block;
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .restaurant-address {
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 5px;
+    }
+
+    .delivery-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9em;
+      color: #888;
+      margin-bottom: 15px;
+    }
+
+    .restaurant-description {
+      color: #666;
+      font-size: 0.95em;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    .restaurant-button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .restaurant-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .error-message {
+      text-align: center;
+      color: #e74c3c;
+      padding: 50px;
+      font-size: 1.1em;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+        margin: 5px;
+        border-radius: 10px;
+      }
+      
+      h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+      }
+      
+      .filters {
+        margin-bottom: 20px;
+      }
+      
+      .filter-btn {
+        padding: 8px 16px;
+        font-size: 0.9em;
+      }
+      
+      .restaurants-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      .restaurant-card {
+        padding: 20px;
+      }
+      
+      .restaurant-name {
+        font-size: 1.2em;
+      }
+      
+      .restaurant-description {
+        font-size: 0.9em;
+      }
+      
+      .restaurant-button {
+        padding: 10px;
+        font-size: 0.95em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🍕 Выберите Ресторан</h1>
+    
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterRestaurants('')">Все</button>
+      <button class="filter-btn" onclick="filterRestaurants('Фастфуд')">Фастфуд</button>
+      <button class="filter-btn" onclick="filterRestaurants('Пицца')">Пицца</button>
+      <button class="filter-btn" onclick="filterRestaurants('Суши')">Суши</button>
+      <button class="filter-btn" onclick="filterRestaurants('Итальянская')">Итальянская</button>
+      <button class="filter-btn" onclick="filterRestaurants('Китайская')">Китайская</button>
+      <button class="filter-btn" onclick="filterRestaurants('Мексиканская')">Мексиканская</button>
+    </div>
+
+    <div id="loading" class="loading">Загрузка ресторанов...</div>
+    <div id="restaurantsList" class="restaurants-grid" style="display: none;"></div>
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
+  </div>
+
+  <script>
+    // Dynamic API base URL - works on both localhost and network
+    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+      ? 'http://localhost:5000' 
+      : `http://${window.location.hostname}:5000`;
+    
+    let allRestaurants = [];
+    let userLocation = { lat: 59.9311, lon: 30.3609 }; // Default Saint Petersburg center
+
+    // Get user's location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          userLocation = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          };
+          loadRestaurants();
+        },
+        (error) => {
+          console.log('Доступ к геолокации запрещён, используем локацию по умолчанию');
+          loadRestaurants();
+        }
+      );
+    } else {
+      loadRestaurants();
+    }
+
+    async function loadRestaurants(cuisine = '') {
+      try {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('restaurantsList').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'none';
+
+        const params = new URLSearchParams();
+        if (cuisine) params.append('cuisine', cuisine);
+        if (userLocation.lat && userLocation.lon) {
+          params.append('lat', userLocation.lat);
+          params.append('lon', userLocation.lon);
+        }
+
+        const response = await fetch(`${API_BASE}/restaurants?${params}`);
+        if (!response.ok) throw new Error('Failed to fetch restaurants');
+        
+        const restaurants = await response.json();
+        allRestaurants = restaurants;
+        displayRestaurants(restaurants);
+        
+      } catch (error) {
+        console.error('Error loading restaurants:', error);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorMessage').textContent = 
+          'Не удалось загрузить рестораны. Пожалуйста, убедитесь, что сервер запущен.';
+      }
+    }
+
+    function displayRestaurants(restaurants) {
+      const container = document.getElementById('restaurantsList');
+      document.getElementById('loading').style.display = 'none';
+      
+      if (restaurants.length === 0) {
+        container.innerHTML = '<div class="error-message">Не найдено ресторанов по данному фильтру.</div>';
+      } else {
+        container.innerHTML = restaurants.map(restaurant => `
+          <div class="restaurant-card">
+            <div class="restaurant-header">
+              <h3 class="restaurant-name">${restaurant.name}</h3>
+              <div class="restaurant-rating">⭐ ${restaurant.rating}</div>
+            </div>
+            
+            <div class="restaurant-info">
+              <div class="cuisine-type">${restaurant.cuisine_type}</div>
+              <div class="restaurant-address">📍 ${restaurant.address}</div>
+              <div class="delivery-info">
+                <span>🕒 ${restaurant.delivery_time} min</span>
+                ${restaurant.distance ? `<span>📍 ${restaurant.distance} km</span>` : ''}
+              </div>
+            </div>
+            
+            <div class="restaurant-description">
+              ${restaurant.description}
+            </div>
+            
+            <button class="restaurant-button" onclick="goToRestaurant(${restaurant.id})">
+              Посмотреть Меню и Заказать
+            </button>
+          </div>
+        `).join('');
+      }
+      
+      container.style.display = 'grid';
+    }
+
+    function filterRestaurants(cuisine) {
+      // Update active filter button
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      loadRestaurants(cuisine);
+    }
+
+    function goToRestaurant(restaurantId) {
+      localStorage.setItem('selectedRestaurant', restaurantId);
+      window.location.href = 'restaurant.html';
+    }
+
+    // Load restaurants on page load
+    if (!navigator.geolocation) {
+      loadRestaurants();
+    }
+  </script>
+
+</body>
+</html>
